@@ -79,5 +79,8 @@ public struct ALKConfiguration {
     /// If true then typing status will show user names.
     public var showNameWhenUserTypesInGroup = true
     
+    /// color of the title
+    public var navigationTitleColor = UIColor.white
+    
     public init() { }
 }

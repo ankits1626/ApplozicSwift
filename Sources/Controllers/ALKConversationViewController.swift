@@ -333,6 +333,7 @@ open class ALKConversationViewController: ALKBaseViewController, Localizable {
 
     override open func viewDidLoad() {
         super.viewDidLoad()
+        titleButton.setTitleColor(configuration.navigationTitleColor, for: .normal)
     }
 
     override open func viewDidLayoutSubviews() {
