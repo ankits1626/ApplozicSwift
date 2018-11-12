@@ -265,7 +265,7 @@ open class ALKConversationListViewController: ALKBaseViewController, Localizable
         self.navigationController?.pushViewController(viewController, animated: false)
     }
 
-    @objc func compose() {
+    @objc public func compose() {
         // Send notification outside that button is clicked
         NotificationCenter.default.post(name: NSNotification.Name(rawValue: configuration.nsNotificationNameForNavIconClick), object: self)
         if configuration.handleNavIconClickOnConversationListView {
