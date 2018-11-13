@@ -18,49 +18,51 @@ open class ALKReplyMessageView: UIView, Localizable {
     
     open let nameLabel: UILabel = {
         let label = UILabel(frame: CGRect.zero)
+        label.font = UIFont.systemFont(ofSize: 13, weight: UIFont.Weight.bold)
         label.text = "Name"
         label.numberOfLines = 1
         return label
     }()
-
+    
     open let messageLabel: UILabel = {
         let label = UILabel(frame: CGRect.zero)
+        label.font = UIFont.systemFont(ofSize: 12, weight: UIFont.Weight.light)
         label.text = "The message"
         label.numberOfLines = 1
         return label
     }()
-
+    
     open let closeButton: UIButton = {
         let button = UIButton(frame: CGRect.zero)
         let closeImage = UIImage(named: "close", in: Bundle.applozic, compatibleWith: nil)
         button.setImage(closeImage, for: .normal)
         return button
     }()
-
+    
     open let previewImageView: UIImageView = {
         let imageView = UIImageView(frame: CGRect.zero)
         imageView.backgroundColor = .clear
         return imageView
     }()
-
+    
     lazy open var selfNameText: String = {
         let text = localizedString(forKey: "You", withDefaultValue: SystemMessage.LabelName.You, fileName: configuration.localizedStringFileName)
         return text
     }()
     
     public var closeButtonTapped: ((Bool)->())?
-
+    
     private var message: ALKMessageViewModel?
-
+    
     private enum Padding {
-
+        
         enum NameLabel {
             static let height: CGFloat = 30.0
             static let left: CGFloat = 10.0
             static let right: CGFloat = -10.0
             static let top: CGFloat = 5.0
         }
-
+        
         enum MessageLabel {
             static let height: CGFloat = 30.0
             static let left: CGFloat = 10.0
@@ -68,7 +70,7 @@ open class ALKReplyMessageView: UIView, Localizable {
             static let top: CGFloat = 5.0
             static let bottom: CGFloat = -5.0
         }
-
+        
         enum CloseButton {
             static let height: CGFloat = 30.0
             static let width: CGFloat = 30.0
@@ -76,7 +78,7 @@ open class ALKReplyMessageView: UIView, Localizable {
             static let top: CGFloat = 5.0
             static let bottom: CGFloat = -5.0
         }
-
+        
         enum PreviewImageView {
             static let height: CGFloat = 50.0
             static let width: CGFloat = 80.0
@@ -84,44 +86,44 @@ open class ALKReplyMessageView: UIView, Localizable {
             static let top: CGFloat = 5.0
             static let bottom: CGFloat = -5.0
         }
-
+        
     }
-
+    
     init(frame: CGRect, configuration: ALKConfiguration) {
         super.init(frame: frame)
         self.configuration = configuration
         setUpViews()
     }
-
+    
     required public init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-
+    
     open func update(message: ALKMessageViewModel) {
         self.message = message
         nameLabel.text = message.isMyMessage ?
             selfNameText:message.displayName
         messageLabel.text = getMessageText()
-
+        
         if let imageURL = getURLForPreviewImage(message: message) {
             setImageFrom(url: imageURL, to: previewImageView)
         } else {
             previewImageView.image = placeholderForPreviewImage(message: message)
         }
     }
-
+    
     //MARK: - Internal methods
-
+    
     private func setUpViews() {
         setUpConstraints()
         closeButton.addTarget(self, action: #selector(closeButtonTapped(_:)), for: .touchUpInside)
     }
-
+    
     private func setUpConstraints() {
         self.addViewsForAutolayout(views: [nameLabel, messageLabel, closeButton, previewImageView])
-
+        
         let view = self
-
+        
         nameLabel.heightAnchor.constraint(
             lessThanOrEqualToConstant: Padding.NameLabel.height)
             .isActive = true
@@ -134,7 +136,7 @@ open class ALKReplyMessageView: UIView, Localizable {
         nameLabel.topAnchor.constraint(
             equalTo: view.topAnchor,
             constant: Padding.NameLabel.top).isActive = true
-
+        
         messageLabel.heightAnchor.constraint(
             lessThanOrEqualToConstant: Padding.MessageLabel.height)
             .isActive = true
@@ -150,7 +152,7 @@ open class ALKReplyMessageView: UIView, Localizable {
         messageLabel.bottomAnchor.constraint(
             equalTo: view.bottomAnchor,
             constant: Padding.MessageLabel.bottom).isActive = true
-
+        
         closeButton.heightAnchor.constraint(
             lessThanOrEqualToConstant: Padding.CloseButton.height)
             .isActive = true
@@ -165,7 +167,7 @@ open class ALKReplyMessageView: UIView, Localizable {
         closeButton.bottomAnchor.constraint(
             equalTo: messageLabel.topAnchor,
             constant: Padding.CloseButton.bottom).isActive = true
-
+        
         previewImageView.heightAnchor.constraint(
             lessThanOrEqualToConstant: Padding.PreviewImageView.height)
             .isActive = true
@@ -180,13 +182,13 @@ open class ALKReplyMessageView: UIView, Localizable {
         previewImageView.bottomAnchor.constraint(
             equalTo: messageLabel.bottomAnchor,
             constant: 0).isActive = true
-
+        
     }
-
+    
     @objc private func closeButtonTapped(_ sender: UIButton) {
         closeButtonTapped?(true)
     }
-
+    
     private func getMessageText() -> String? {
         guard let message = message else {return nil}
         switch message.messageType {
@@ -196,11 +198,11 @@ open class ALKReplyMessageView: UIView, Localizable {
             return message.messageType.rawValue
         }
     }
-
+    
     private func setImageFrom(url: URL?, to imageView: UIImageView) {
         imageView.kf.setImage(with: url)
     }
-
+    
     private func getURLForPreviewImage(message: ALKMessageViewModel) -> URL? {
         switch message.messageType {
         case .photo, .video:
@@ -211,7 +213,7 @@ open class ALKReplyMessageView: UIView, Localizable {
             return nil
         }
     }
-
+    
     private func getImageURL(for message: ALKMessageViewModel) -> URL? {
         guard message.messageType == .photo else {return nil}
         if let filePath = message.filePath {
@@ -223,21 +225,21 @@ open class ALKReplyMessageView: UIView, Localizable {
         }
         return nil
     }
-
+    
     private func getMapImageURL(for message: ALKMessageViewModel) -> URL?  {
         guard message.messageType == .location else {return nil}
         guard let lat = message.geocode?.location.latitude,
             let lon = message.geocode?.location.longitude
             else { return nil }
-
+        
         let latLonArgument = String(format: "%f,%f", lat, lon)
         guard let apiKey = ALUserDefaultsHandler.getGoogleMapAPIKey()
             else { return nil }
         let urlString = "https://maps.googleapis.com/maps/api/staticmap?center=\(latLonArgument)&zoom=17&size=375x295&maptype=roadmap&format=png&visual_refresh=true&markers=\(latLonArgument)&key=\(apiKey)"
         return URL(string: urlString)
-
+        
     }
-
+    
     private func placeholderForPreviewImage(message: ALKMessageViewModel) -> UIImage? {
         switch message.messageType {
         case .video:
@@ -253,7 +255,7 @@ open class ALKReplyMessageView: UIView, Localizable {
             return nil
         }
     }
-
+    
     private func getThumbnail(filePath: URL) -> UIImage? {
         do {
             let asset = AVURLAsset(url: filePath , options: nil)
@@ -261,7 +263,7 @@ open class ALKReplyMessageView: UIView, Localizable {
             imgGenerator.appliesPreferredTrackTransform = true
             let cgImage = try imgGenerator.copyCGImage(at: CMTimeMake(0, 1), actualTime: nil)
             return UIImage(cgImage: cgImage)
-
+            
         } catch let error {
             print("*** Error generating thumbnail: \(error.localizedDescription)")
             return nil
