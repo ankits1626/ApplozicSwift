@@ -503,19 +503,21 @@ open class ALKMessageCell: ALKChatBaseCell<ALKMessageViewModel>, ALKCopyMenuItem
 
     fileprivate var replyView: UIView = {
         let view = UIView(frame: CGRect.zero)
-        view.backgroundColor = UIColor.darkGray
+        view.backgroundColor = UIColor.lightGray
         view.isUserInteractionEnabled = true
         return view
     }()
 
     fileprivate var replyNameLabel: UILabel = {
         let label = UILabel(frame: CGRect.zero)
+        label.font = UIFont.systemFont(ofSize: 13, weight: UIFont.Weight.bold)
         label.numberOfLines = 1
         return label
     }()
 
     fileprivate var replyMessageLabel: UILabel = {
         let label = UILabel(frame: CGRect.zero)
+        label.font = UIFont.systemFont(ofSize: 12, weight: UIFont.Weight.light)
         label.numberOfLines = 1
         return label
     }()
