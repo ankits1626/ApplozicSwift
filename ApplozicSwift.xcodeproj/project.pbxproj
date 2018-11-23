@@ -126,6 +126,7 @@
 		8BB533FB1F69463C0008C1CF /* UIViewController+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BB533861F69463B0008C1CF /* UIViewController+Extension.swift */; };
 		8BB533FF1F6946970008C1CF /* ApplozicSwiftTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BB533FD1F6946970008C1CF /* ApplozicSwiftTests.swift */; };
 		8BB534001F6946970008C1CF /* Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 8BB533FE1F6946970008C1CF /* Info.plist */; };
+		9894480221A7CABF00F41875 /* UINavigationController+LoadConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9894480121A7CABF00F41875 /* UINavigationController+LoadConfiguration.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -262,6 +263,7 @@
 		8BB533861F69463B0008C1CF /* UIViewController+Extension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UIViewController+Extension.swift"; sourceTree = "<group>"; };
 		8BB533FD1F6946970008C1CF /* ApplozicSwiftTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ApplozicSwiftTests.swift; sourceTree = "<group>"; };
 		8BB533FE1F6946970008C1CF /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		9894480121A7CABF00F41875 /* UINavigationController+LoadConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UINavigationController+LoadConfiguration.swift"; sourceTree = "<group>"; };
 		B67BC368C8C8A4DDE39D1822 /* Pods_ApplozicSwift.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_ApplozicSwift.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -498,6 +500,7 @@
 		8BB5330F1F69463B0008C1CF /* Sources */ = {
 			isa = PBXGroup;
 			children = (
+				9894480021A7CA9F00F41875 /* Extensions */,
 				8B6DE5A11F69671D001DB7FC /* Resources */,
 				8B6DE5A01F696337001DB7FC /* Extras */,
 				8B6DE59F1F69604F001DB7FC /* Utilities */,
@@ -516,6 +519,14 @@
 				8BB533FE1F6946970008C1CF /* Info.plist */,
 			);
 			path = Tests;
+			sourceTree = "<group>";
+		};
+		9894480021A7CA9F00F41875 /* Extensions */ = {
+			isa = PBXGroup;
+			children = (
+				9894480121A7CABF00F41875 /* UINavigationController+LoadConfiguration.swift */,
+			);
+			path = Extensions;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -671,6 +682,7 @@
 				8BB533F71F69463C0008C1CF /* UIStoryboard+Extension.swift in Sources */,
 				8BB533F81F69463C0008C1CF /* UITableView+Extension.swift in Sources */,
 				8BB533D31F69463C0008C1CF /* CGSize+Extension.swift in Sources */,
+				9894480221A7CABF00F41875 /* UINavigationController+LoadConfiguration.swift in Sources */,
 				8BB533F51F69463C0008C1CF /* UIImaveView+Extension.swift in Sources */,
 				8BB533931F69463B0008C1CF /* ALKChatCell.swift in Sources */,
 				8BB533871F69463B0008C1CF /* ALContact+Extension.swift in Sources */,

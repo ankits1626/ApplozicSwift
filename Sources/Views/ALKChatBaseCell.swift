@@ -11,6 +11,7 @@ import UIKit
 open class ALKChatBaseCell<T>: ALKBaseCell<T>, Localizable {
     
     var localizedStringFileName: String!
+    var configuration : ALKConfiguration!
     
     public func setLocalizedStringFileName(_ localizedStringFileName: String) {
         self.localizedStringFileName = localizedStringFileName
