@@ -66,7 +66,8 @@ public class ALKPushNotificationHandler {
                 weakSelf.title = displayName
             }
 
-            if UIApplication.shared.applicationState == .active {
+            //Disabling as of now to avoid unnecessaru vaigation stack
+            /*if UIApplication.shared.applicationState == .active {
                 guard let userInfo = notification.userInfo, let alertValue = userInfo["alertValue"] as? String else {
                         return
                 }
@@ -78,7 +79,7 @@ public class ALKPushNotificationHandler {
                 })
             } else {
                 weakSelf.launchIndividualChatWith(userId: weakSelf.contactId, groupId: weakSelf.groupId)
-            }
+            }*/
 
         })
     }
