@@ -9,15 +9,15 @@
 import Foundation
 import Applozic
 
-public class ALKPushNotificationHandler {
+public class ALKPushNotificationHandler: Localizable {
     public static let shared = ALKPushNotificationHandler()
     var navVC: UINavigationController?
 
     var contactId: String?
     var groupId: NSNumber?
+    var conversationId: NSNumber?
     var title: String = ""
     var configuration: ALKConfiguration!
-
 
     private var alContact: ALContact? {
         let alContactDbService = ALContactDBService()
@@ -47,22 +47,33 @@ public class ALKPushNotificationHandler {
         // No need to add removeObserver() as it is present in pushAssist.
         NotificationCenter.default.addObserver(forName: NSNotification.Name(rawValue: "showNotificationAndLaunchChat"), object: nil, queue: nil, using: {[weak self] notification in
             print("launch chat push notification received")
-
+            self?.contactId = nil
+            self?.groupId = nil
+            self?.title = ""
+            self?.conversationId = nil
             //Todo: Handle group
 
             guard let weakSelf = self, let object = notification.object as? String else { return }
             let components = object.components(separatedBy: ":")
-            if components.count > 1 {
+            
+            let noNameMessage = weakSelf.localizedString(forKey: "NoNameMessage", withDefaultValue: SystemMessage.NoData.NoName, fileName: configuration.localizedStringFileName)
+            
+            if components.count > 2 {
                 guard let componentElement = Int(components[1]) else { return }
                 let id = NSNumber(integerLiteral: componentElement)
                 weakSelf.groupId = id
                 guard let alChannel = weakSelf.alChannel, let name = alChannel.name else { return }
                 weakSelf.title = name
-
+            } else if components.count == 2 {
+                guard let conversationComponent = Int(components[1]) else { return }
+                weakSelf.conversationId = NSNumber(integerLiteral: conversationComponent)
+                weakSelf.contactId = components[0]
+                guard let alContact = weakSelf.alContact else { return }
+                weakSelf.title = alContact.getDisplayName() ?? noNameMessage
             } else {
                 weakSelf.contactId = object
                 guard let alContact = weakSelf.alContact else { return }
-                let displayName = alContact.getDisplayName() ?? "No name"
+                let displayName = alContact.getDisplayName() ?? noNameMessage
                 weakSelf.title = displayName
             }
 
@@ -71,6 +82,7 @@ public class ALKPushNotificationHandler {
                 guard let userInfo = notification.userInfo, let alertValue = userInfo["alertValue"] as? String else {
                         return
                 }
+                ///TODO: FIX HERE. USE conversationId also. 
                 ALUtilityClass.thirdDisplayNotificationTS(alertValue, andForContactId: weakSelf.contactId, withGroupId: weakSelf.groupId, completionHandler: {
 
                     _ in
@@ -90,6 +102,8 @@ public class ALKPushNotificationHandler {
         let messagesVC = ALKConversationListViewController(configuration: configuration)
         messagesVC.contactId = userId
         messagesVC.channelKey = groupId
+        messagesVC.conversationId = self.conversationId
+        
         let pushAssistant = ALPushAssist()
         let topVC =  pushAssistant.topViewController
         let nav = ALKBaseNavigationViewController(rootViewController: messagesVC)

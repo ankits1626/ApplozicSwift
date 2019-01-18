@@ -10,7 +10,7 @@ import XCTest
 import Applozic
 @testable import ApplozicSwift
 class ALKConversationListViewControllerTests: XCTestCase {
-    
+
     let mockMessage: ALMessage = {
         let alMessage = ALMessage()
         alMessage.contactIds = "testUser123"
@@ -29,56 +29,70 @@ class ALKConversationListViewControllerTests: XCTestCase {
         return alMessage
     }()
 
+    var conversationListVC: ALKConversationListViewController!
+
     override func setUp() {
         super.setUp()
-        // Put setup code here. This method is called before the invocation of each test method in the class.
+        conversationListVC = ALKConversationListViewController(configuration: ALKConfiguration())
     }
-    
+
     override func tearDown() {
         // Put teardown code here. This method is called after the invocation of each test method in the class.
         super.tearDown()
     }
 
     func testNewMessage_WhenActiveThreadIsDifferent() {
-        let conversationVC = ALKConversationListViewController(configuration: ALKConfiguration())
         let conversationVM = ALKConversationViewModel(contactId: nil, channelKey: nil, localizedStringFileName: ALKConfiguration().localizedStringFileName)
-        
-        let result = conversationVC.isNewMessageForActiveThread(alMessage: mockMessage, vm: conversationVM)
+
+        let result = conversationListVC.isNewMessageForActiveThread(alMessage: mockMessage, vm: conversationVM)
         XCTAssertFalse(result)
     }
-    
+
     func testNewMessage_WhenActiveThreadIsSame() {
-        let conversationVC = ALKConversationListViewController(configuration: ALKConfiguration())
-        let conversationVM = ALKConversationViewModel(contactId: "testUser123", channelKey: nil, localizedStringFileName: ALKConfiguration().localizedStringFileName)
-        
-        let result = conversationVC.isNewMessageForActiveThread(alMessage: mockMessage, vm: conversationVM)
+        let conversationVM = ALKConversationViewModel(
+            contactId: "testUser123",
+            channelKey: nil,
+            localizedStringFileName: ALKConfiguration().localizedStringFileName)
+        let result = conversationListVC
+            .isNewMessageForActiveThread(alMessage: mockMessage, vm: conversationVM)
         XCTAssertTrue(result)
     }
 
-    func testMuteConversationCalledFromDelegate() {
-        
-        class ALKConversationListViewControllerMock: ALKConversationListViewController {
-            var isMuteCalled: Bool = false
-            
-            required init(configuration: ALKConfiguration) {
-                super.init(configuration: configuration)
-            }
-            
-            required init?(coder aDecoder: NSCoder) {
-                fatalError("init(coder:) has not been implemented")
-            }
-            
-            override func mute(conversation: ALMessage, forTime: Int64, atIndexPath: IndexPath) {
-                isMuteCalled = true
-            }
-        }
-        
-        let conversationListVC = ALKConversationListViewControllerMock(configuration: ALKConfiguration())
-        XCTAssertFalse(conversationListVC.isMuteCalled)
-        let muteConversationVC = MuteConversationViewController(delegate: conversationListVC.self, conversation: mockMessage, atIndexPath: IndexPath(row: 0, section: 0), configuration: ALKConfiguration())
+    func testDelegateCallback_whenMessageThreadIsSelected() {
 
-        muteConversationVC.tappedConfirm()
+        let selectItemExpectation = XCTestExpectation(description: "Conversation list item selected")
+        let conversation = ConversationListTest()
+        conversation.selectItemExpectation = selectItemExpectation
+
+        let conversationListVM = ALKConversationListViewModel()
+        let conversationVC = ALKConversationViewControllerMock(configuration: ALKConfiguration())
+        conversationVC.viewModel = ALKConversationViewModelMock(contactId: nil, channelKey: 000, localizedStringFileName: ALKConfiguration().localizedStringFileName)
+
+        // Pass all mocks
+        conversationListVC.viewModel = conversationListVM
+        conversationListVC.delegate = conversation
+        conversationListVC.dbServiceType = ALMessageDBServiceMock.self
+        conversationListVC.conversationViewController = conversationVC
+
+        // Select first thread
+        conversationListVC.viewWillAppear(false)
+        let firstIndex = IndexPath(row: 0, section: 0)
+        XCTAssertNotNil(conversationListVC.tableView)
+        guard let tableView = conversationListVC.tableView else {
+            return
+        }
+        tableView.delegate?.tableView?(tableView, didSelectRowAt: firstIndex)
         
-        XCTAssertTrue(conversationListVC.isMuteCalled)
+        wait(for: [selectItemExpectation], timeout: 2)
+    }
+    
+    func testMessageSentByLoggedInUser_WhenTypeOutBox() {
+        mockMessage.type = "5" // Message type OUTBOX
+        XCTAssertTrue(conversationListVC.isMessageSentByLoggedInUser(alMessage: mockMessage))
+    }
+    
+    func testMessageSentByLoggedInUser_WhenTypeInBox() {
+        mockMessage.type = "4" // Message type INBOX
+        XCTAssertFalse(conversationListVC.isMessageSentByLoggedInUser(alMessage: mockMessage))
     }
 }

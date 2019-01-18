@@ -16,30 +16,32 @@ open class ALKReplyMessageView: UIView, Localizable {
     
     var configuration: ALKConfiguration!
     
-    open let nameLabel: UILabel = {
+    open var nameLabel: UILabel = {
         let label = UILabel(frame: CGRect.zero)
         label.font = UIFont.systemFont(ofSize: 13, weight: UIFont.Weight.bold)
         label.text = "Name"
         label.numberOfLines = 1
         return label
     }()
-    
-    open let messageLabel: UILabel = {
+
+    open var messageLabel: UILabel = {
         let label = UILabel(frame: CGRect.zero)
         label.font = UIFont.systemFont(ofSize: 12, weight: UIFont.Weight.light)
         label.text = "The message"
         label.numberOfLines = 1
         return label
     }()
-    
-    open let closeButton: UIButton = {
+
+
+    open var closeButton: UIButton = {
         let button = UIButton(frame: CGRect.zero)
         let closeImage = UIImage(named: "close", in: Bundle.applozic, compatibleWith: nil)
         button.setImage(closeImage, for: .normal)
         return button
     }()
-    
-    open let previewImageView: UIImageView = {
+
+
+    open var previewImageView: UIImageView = {
         let imageView = UIImageView(frame: CGRect.zero)
         imageView.backgroundColor = .clear
         return imageView

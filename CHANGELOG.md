@@ -2,7 +2,49 @@
 
 The changelog for [ApplozicSwift](https://github.com/AppLozic/ApplozicSwift). Also see the [releases](https://github.com/AppLozic/ApplozicSwift/releases) on Github.
 
-1.2.0(upcoming release)
+2.0.1 (upcoming release)
+---
+### Enhancements
+
+-[Al-3137] Change quick reply view to a staggered grid layout.
+
+### Fixes
+- Fixed an issue where view was taking time in moving upwards when keyboard appears in the screen.
+
+2.0.0
+---
+### Fixes
+
+- [AL-3170] Fixed a memory leak issue in ALKConversationViewController.
+
+### Enhancements
+
+- [AL-2856] Dismiss Typing indicator in 30 seconds if stop flag not received
+- [AL 3136] Default message meta data configuration
+- Use the same bubble in case of menu click show and hide if style setting is passed
+
+1.3.0
+---
+### Enhancements
+
+- [AL-2856] Added a header view in chat bar to inject custom views from outside.
+- [AL-3044] Added ALKConversationListDelegate to get chat thread selection callback.
+	 And updated properties of `ALKChatViewModelProtocol` to public.
+- [AL-2923] Added configure for hide start new in empty conversation
+- [AL-2923] Added configure for hide back button in conversation list
+- [AL-2923] Added configure for changing  color in navigation title
+- [Al-3093] Update rich message layout to display message on top of templates.
+- [AL-3131] Update notification to support context-based-chat.
+- [AL-3088] Separate tableview from ConversationListViewController.
+
+### Fixes
+
+- [AL-3056] Fix an issue where earlier conversation won't load when scrolled to top.
+- [AL-2923] Fix the crash for media cells for localization file name.
+- [Al-3123] Fix an issue where notification will come for the message sent by the logged in user from different device.
+- [AL-3117] Refresh conversationView when it is opened.
+
+1.2.0
 ---
 ### Enhancements
 - [AL-3004] Update chat screen to enable/disble chat for user when user is added/removed in the group.

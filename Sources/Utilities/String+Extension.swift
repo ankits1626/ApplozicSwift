@@ -30,20 +30,23 @@ extension String {
 //get index of char
 extension String {
     public func indexOfCharacter(char: Character) -> Int? {
-        if let idx = characters.index(of: char) {
-            return characters.distance(from: startIndex, to: idx)
+        guard let range = range(of: String(char)) else {
+            return nil
         }
-        return nil
+        return distance(from: startIndex, to: range.lowerBound)
     }
 }
 
 //get w h
 extension String {
     func heightWithConstrainedWidth(width: CGFloat, font: UIFont) -> CGFloat {
+        return self.rectWithConstrainedWidth(width, font: font).height
+    }
+
+    func rectWithConstrainedWidth(_ width: CGFloat, font: UIFont) -> CGRect {
         let constraintRect = CGSize(width: width, height: .greatestFiniteMagnitude)
-        let boundingBox = self.boundingRect(with: constraintRect, options: .usesLineFragmentOrigin, attributes: [NSAttributedStringKey.font: font], context: nil)
-        
-        return boundingBox.height
+        let boundingBox = self.boundingRect(with: constraintRect, options: .usesLineFragmentOrigin, attributes: [NSAttributedString.Key.font: font], context: nil)
+        return boundingBox
     }
     
     func evaluateStringWidth (textToEvaluate: String,fontSize:CGFloat) -> CGFloat{

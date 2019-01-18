@@ -30,6 +30,7 @@ open class ALKBaseViewController: UIViewController, ALKConfigurable {
         self.navigationController?.navigationBar.barTintColor = configuration.navigationBarBackgroundColor
         self.navigationController?.navigationBar.tintColor = configuration.navigationBarItemColor
         self.navigationController?.navigationBar.titleTextAttributes = [NSAttributedStringKey.foregroundColor : configuration.navigationTitleColor]
+        self.navigationController?.navigationBar.titleTextAttributes = [NSAttributedStringKey.foregroundColor:configuration.navigationBarTitleColor]
         self.navigationController?.navigationBar.isTranslucent = false
         if self.navigationController?.viewControllers.first != self {
             var backImage = UIImage.init(named: "icon_back", in: Bundle.applozic, compatibleWith: nil)

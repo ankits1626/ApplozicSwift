@@ -12,7 +12,7 @@ import Kingfisher
 import MGSwipeTableCell
 import Applozic
 
-protocol ALKChatViewModelProtocol {
+public protocol ALKChatViewModelProtocol {
     var avatar: URL? { get }
     var avatarImage: UIImage? { get }
     var avatarGroupImageUrl: String? { get }
@@ -428,7 +428,7 @@ final class ALKChatCell: MGSwipeTableCell {
         var firstTwoCharStr = ""
 
         for string in stringInputArr {
-            guard let firstChar = string.characters.first else { continue }
+            guard let firstChar = string.first else { continue }
             firstTwoCharStr = firstTwoCharStr + String(firstChar)
         }
         return firstTwoCharStr
