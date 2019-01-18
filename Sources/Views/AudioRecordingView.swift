@@ -29,7 +29,7 @@ open class ALKAudioRecorderView: UIView, Localizable {
     
     lazy var slideToCancel: UILabel = {
         let label = self.commonLabel()
-        label.font = UIFont(name: "HelveticaNeue", size: 15)
+        label.font = UIFont(name: "HelveticaNeue", size: 12)
         label.textColor = UIColor(red: 140, green: 137, blue: 137)
         return label
     }()
