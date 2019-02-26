@@ -241,7 +241,6 @@ extension ALKConversationViewController: UITableViewDelegate, UITableViewDataSou
             } else {
                 let cell: ALKFriendVideoCell = tableView.dequeueReusableCell(forIndexPath: indexPath)
                 cell.configuration = configuration
-
                 cell.setLocalizedStringFileName(configuration.localizedStringFileName)
                 cell.update(viewModel: message)
                 cell.downloadTapped = {[weak self]
@@ -281,7 +280,8 @@ extension ALKConversationViewController: UITableViewDelegate, UITableViewDataSou
                 guard let template = viewModel.genericTemplateFor(message: message) as? [ALKGenericListTemplate] else { return UITableViewCell() }
                 cell.update(viewModel: message)
                 cell.buttonSelected = {[unowned self] tag, title in
-                    self.postGenericListButtonTapNotification(tag: tag, title: title, template: template)
+
+                    self.postGenericListButtonTapNotification(tag: tag, title: title, template: template, key: message.identifier)
                 }
                 return cell
             } else {
@@ -290,7 +290,7 @@ extension ALKConversationViewController: UITableViewDelegate, UITableViewDataSou
                 guard let template = viewModel.genericTemplateFor(message: message) as? [ALKGenericListTemplate] else { return UITableViewCell() }
                 cell.update(viewModel: message)
                 cell.buttonSelected = {[unowned self] tag, title in
-                    self.postGenericListButtonTapNotification(tag: tag, title: title, template: template)
+                    self.postGenericListButtonTapNotification(tag: tag, title: title, template: template, key: message.identifier)
                 }
                 return cell
             }
@@ -310,8 +310,38 @@ extension ALKConversationViewController: UITableViewDelegate, UITableViewDataSou
                     return cell
                 }
                 cell.quickReplyView.quickReplySelected = {[weak self] tag, title, metadata in
-                    guard let index = tag else { return }
-                    self?.quickReplySelected(index: index, title: title, template: template, message: message, metadata: metadata)
+                    guard let weakSelf = self,
+                        let index = tag else { return }
+                    weakSelf.quickReplySelected(
+                        index: index,
+                        title: title,
+                        template: template,
+                        message: message,
+                        metadata: metadata,
+                        isButtonClickDisabled: weakSelf.configuration.disableRichMessageButtonAction)
+                }
+                return cell
+            }
+        case .button:
+            if message.isMyMessage {
+                /// No button action if message sent by same user.
+                let cell: ALKMyMessageButtonCell = tableView.dequeueReusableCell(forIndexPath: indexPath)
+                cell.setLocalizedStringFileName(configuration.localizedStringFileName)
+                cell.update(viewModel: message, maxWidth: UIScreen.main.bounds.width)
+                cell.update(chatBar: self.chatBar)
+                return cell
+            } else {
+                let cell: ALKFriendMessageButtonCell = tableView.dequeueReusableCell(forIndexPath: indexPath)
+                cell.setLocalizedStringFileName(configuration.localizedStringFileName)
+                cell.update(viewModel: message, maxWidth: UIScreen.main.bounds.width)
+                cell.update(chatBar: self.chatBar)
+                cell.buttonView.buttonSelected = {[weak self] index, title in
+                    guard let weakSelf = self else { return }
+                    weakSelf.messageButtonSelected(
+                        index: index,
+                        title: title,
+                        message: message,
+                        isButtonClickDisabled: weakSelf.configuration.disableRichMessageButtonAction)
                 }
                 return cell
             }
@@ -352,7 +382,7 @@ extension ALKConversationViewController: UITableViewDelegate, UITableViewDataSou
     }
     
     public func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
-        
+
         guard let message = viewModel.messageForRow(indexPath: IndexPath(row: 0, section: section)) else {
             return nil
         }
@@ -365,14 +395,12 @@ extension ALKConversationViewController: UITableViewDelegate, UITableViewDataSou
         dateView.dateView.backgroundColor = configuration.conversationViewCustomCellBackgroundColor
         dateView.dateLabel.backgroundColor = configuration.conversationViewCustomCellBackgroundColor
         dateView.dateLabel.textColor = configuration.conversationViewCustomCellTextColor
-        
         // Set date text
         dateView.setupDate(withDateFormat: date.stringCompareCurrentDate())
         return dateView
     }
     
     public func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
-        
         guard let message = viewModel.messageForRow(indexPath: indexPath) else {
             return
         }
@@ -490,18 +518,18 @@ extension ALKConversationViewController: UICollectionViewDataSource,UICollection
     }
 
     public func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        
+
         guard let collectionView = collectionView as? ALKIndexedCollectionView
             else {
                 return UICollectionViewCell()
         }
-        
+
         guard let message = viewModel.messageForRow(indexPath: IndexPath(row: 0, section: collectionView.tag)),
             let template = viewModel.genericTemplateFor(message: message) as? ALKGenericCardTemplate,
             template.cards.count > indexPath.row else {
                 return UICollectionViewCell()
         }
-        
+
         let cell: ALKGenericCardCell = collectionView.dequeueReusableCell(forIndexPath: indexPath)
         let card = template.cards[indexPath.row]
         cell.update(card: card)
@@ -513,27 +541,24 @@ extension ALKConversationViewController: UICollectionViewDataSource,UICollection
             infoDict["buttonIndex"] = tag
             infoDict["card"] = card
             infoDict["template"] = template
+            infoDict["messageKey"] = message.identifier
             infoDict["userId"] = strongSelf.viewModel.contactId
             NotificationCenter.default.post(name: Notification.Name(rawValue: "GenericRichCardButtonSelected"), object: infoDict)
         }
         return cell
-        
-        
     }
-    
+
     public func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-        
         guard let message = viewModel.messageForRow(indexPath: IndexPath(row: 0, section: collectionView.tag)) else {
             return CGSize(width: 0, height: 0)
         }
         if message.messageType == .genericCard {
-            
             let width = self.view.frame.width - 100 // - 100 to ensure the card appears in the screen
             let height = ALKGenericCardCollectionView.rowHeightFor(message: message) - 40 // Extra padding for top and bottom
             return CGSize(width: width, height: height)
         }
         return CGSize(width: self.view.frame.width-50, height: 350)
-        
+
     }
-    
+
 }

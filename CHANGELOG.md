@@ -2,11 +2,31 @@
 
 The changelog for [ApplozicSwift](https://github.com/AppLozic/ApplozicSwift). Also see the [releases](https://github.com/AppLozic/ApplozicSwift/releases) on Github.
 
-2.0.1 (upcoming release)
+2.3.0 (upcoming releases)
+---
+### Enhancments
+- Updates Swift version to 4.2
+
+2.2.0
+---
+### Enhancments
+
+-[AL-3196] Add a config option to disable the rich message button clicks.
+- Now message key will also come in the click action for rich messages.
+- Updated send button padding to make both height and width same.
+
+### Fixes
+
+-[AL-3224] Fixed an issue where changing background color was not updating the background of conversation view.
+-[AL-3240] Fixed an where clicking mute/unmute and if the title is large then it was going out of screen.
+-[AL-3241] Fixed an issue where if we update the name it was also updating the group icon.
+
+2.1.0
 ---
 ### Enhancements
 
 -[Al-3137] Change quick reply view to a staggered grid layout.
+-[AL-3137] Added support for submit button and link button as rich messages.
 
 ### Fixes
 - Fixed an issue where view was taking time in moving upwards when keyboard appears in the screen.
@@ -29,7 +49,7 @@ The changelog for [ApplozicSwift](https://github.com/AppLozic/ApplozicSwift). Al
 
 - [AL-2856] Added a header view in chat bar to inject custom views from outside.
 - [AL-3044] Added ALKConversationListDelegate to get chat thread selection callback.
-	 And updated properties of `ALKChatViewModelProtocol` to public.
+And updated properties of `ALKChatViewModelProtocol` to public.
 - [AL-2923] Added configure for hide start new in empty conversation
 - [AL-2923] Added configure for hide back button in conversation list
 - [AL-2923] Added configure for changing  color in navigation title

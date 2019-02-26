@@ -9,13 +9,13 @@ import UIKit
 import Kingfisher
 
 open class ALKGenericCardCollectionView: ALKIndexedCollectionView {
-
+    
     open var cardTemplate: ALKGenericCardTemplate?
-
+    
     override open func setMessage(viewModel: ALKMessageViewModel) {
         super.setMessage(viewModel: viewModel)
         // set card template
-
+        
         guard
             let metadata = viewModel.metadata,
             let payload = metadata["payload"] as? String
@@ -27,7 +27,7 @@ open class ALKGenericCardCollectionView: ALKIndexedCollectionView {
             print("\(error)")
         }
     }
-
+    
     override open class func rowHeightFor(message: ALKMessageViewModel) -> CGFloat {
         guard let template = getCardTemplate(message: message),
             !template.cards.isEmpty,
@@ -37,7 +37,7 @@ open class ALKGenericCardCollectionView: ALKIndexedCollectionView {
         }
         return ALKGenericCardCell.rowHeightFor(card: card)
     }
-
+    
     private class func getCardTemplate(message: ALKMessageViewModel) -> ALKGenericCardTemplate? {
         guard
             let metadata = message.metadata,
@@ -52,11 +52,11 @@ open class ALKGenericCardCollectionView: ALKIndexedCollectionView {
             return nil
         }
     }
-
+    
 }
 
 open class ALKGenericCardCell: UICollectionViewCell {
-
+    
     open var coverImageView: UIImageView = {
         let imageView = UIImageView(frame: CGRect.zero)
         imageView.image = UIImage(named: "placeholder", in: Bundle.applozic, compatibleWith: nil)
@@ -83,7 +83,7 @@ open class ALKGenericCardCell: UICollectionViewCell {
         label.numberOfLines = 1
         return label
     }()
-
+    
     open var titleLabel: UILabel = {
         let label = UILabel()
         label.text = ""
@@ -92,7 +92,7 @@ open class ALKGenericCardCell: UICollectionViewCell {
         label.textColor = UIColor.black
         return label
     }()
-
+    
     open var subtitleLabel: UILabel = {
         let label = UILabel()
         label.text = ""
@@ -101,7 +101,7 @@ open class ALKGenericCardCell: UICollectionViewCell {
         label.textColor = UIColor.gray
         return label
     }()
-
+    
     open var descriptionLabel: VerticalAlignLabel = {
         let label = VerticalAlignLabel()
         label.text = "DescriptionLabel"
@@ -118,7 +118,7 @@ open class ALKGenericCardCell: UICollectionViewCell {
         stackView.distribution = .fill
         return stackView
     }()
-
+    
     open var mainStackView: UIStackView = {
         let stackView = UIStackView()
         stackView.axis = .vertical
@@ -127,7 +127,7 @@ open class ALKGenericCardCell: UICollectionViewCell {
         stackView.spacing = 3.0
         return stackView
     }()
-
+    
     open var buttonStackView: UIStackView = {
         let stackView = UIStackView()
         stackView.axis = .vertical
@@ -143,7 +143,7 @@ open class ALKGenericCardCell: UICollectionViewCell {
         view.layer.borderWidth = 1
         return view
     }()
-
+    
     public enum Padding {
         enum CoverImageView {
             static var top: CGFloat = 10.0
@@ -157,29 +157,29 @@ open class ALKGenericCardCell: UICollectionViewCell {
             static var right: CGFloat = 0
         }
     }
-
+    
     open var descriptionLabelHeight: CGFloat = 80.0
     open var titleLabelStackViewHeight: CGFloat = 30.0
     open var subtitleLabelHeight: CGFloat = 20.0
-
+    
     open var actionButtons = [UIButton]()
     open var card: ALKGenericCard!
     open var buttonSelected: ((_ index: Int, _ name: String)->())?
-
+    
     override open func awakeFromNib() {
         super.awakeFromNib()
     }
-
+    
     public override init(frame: CGRect) {
         super.init(frame: frame)
         setUpButtons()
         setUpViews()
     }
-
+    
     required public init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
     }
-
+    
     open class func rowHeightFor(card: ALKGenericCard) -> CGFloat {
         let buttonHeight = 35
         let baseHeight:CGFloat = 200
@@ -188,7 +188,7 @@ open class ALKGenericCardCell: UICollectionViewCell {
         let totalButtonHeight:CGFloat = (card.buttons != nil) ? CGFloat(buttonHeight*(card.buttons?.count)!):0
         return baseHeight + coverImageHeight + totalButtonHeight + padding
     }
-
+    
     open func update(card: ALKGenericCard) {
         self.card = card
         self.titleLabel.text = card.title
@@ -200,7 +200,7 @@ open class ALKGenericCardCell: UICollectionViewCell {
         guard let buttons = card.buttons, !buttons.isEmpty else {return}
         updateViewFor(buttons)
     }
-
+    
     @objc func buttonSelected(_ action: UIButton) {
         self.buttonSelected?(action.tag, action.currentTitle ?? "")
     }
@@ -229,7 +229,7 @@ open class ALKGenericCardCell: UICollectionViewCell {
         }
         self.ratingLabel.text = String(rating)
     }
-
+    
     private func setUpButtons() {
         actionButtons = (1...3).map {
             let button = UIButton()
@@ -248,10 +248,10 @@ open class ALKGenericCardCell: UICollectionViewCell {
         setupConstraints()
         backgroundColor = .clear
     }
-
+    
     private func setupConstraints() {
         let view = contentView
-
+        
         titleStackView.addArrangedSubview(titleLabel)
         titleStackView.addArrangedSubview(ratingLabel)
         actionButtons.forEach {
@@ -263,50 +263,50 @@ open class ALKGenericCardCell: UICollectionViewCell {
         mainStackView.addArrangedSubview(subtitleLabel)
         mainStackView.addArrangedSubview(descriptionLabel)
         mainStackView.addArrangedSubview(buttonStackView)
-
+        
         view.addViewsForAutolayout(views: [mainBackgroundView, coverImageView, mainStackView, overlayText])
-
+        
         coverImageView.topAnchor.constraint(equalTo: view.topAnchor, constant: Padding.CoverImageView.top).isActive = true
         coverImageView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: Padding.CoverImageView.left).isActive = true
         coverImageView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: Padding.mainStackView.right).isActive = true
         coverImageView.heightAnchor.constraint(equalToConstant: Padding.CoverImageView.height).isActive = true
         coverImageView.heightAnchor.constraintEqualToAnchor(constant: 0, identifier: "coverImage")?.isActive = true
-
+        
         overlayText.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 0).isActive = true
         overlayText.centerYAnchor.constraint(equalTo: coverImageView.centerYAnchor, constant: 0).isActive = true
         overlayText.trailingAnchor.constraint(lessThanOrEqualTo: view.trailingAnchor).isActive = true
-
+        
         mainStackView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: Padding.mainStackView.left).isActive = true
         mainStackView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: Padding.mainStackView.right).isActive = true
         mainStackView.topAnchor.constraint(equalTo: coverImageView.bottomAnchor).isActive = true
         mainStackView.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: Padding.mainStackView.bottom).isActive = true
-
+        
         titleStackView.heightAnchor.constraint(equalToConstant: titleLabelStackViewHeight).isActive = true
         titleStackView.leadingAnchor.constraint(equalTo: mainStackView.leadingAnchor, constant: 10).isActive = true
         titleStackView.trailingAnchor.constraint(equalTo: mainStackView.trailingAnchor, constant: -10).isActive = true
-
+        
         ratingLabel.trailingAnchor.constraint(equalTo: titleStackView.trailingAnchor, constant: -10).isActive = true
         ratingLabel.widthAnchor.constraint(lessThanOrEqualToConstant: 40).isActive = true
         titleLabel.leadingAnchor.constraint(equalTo: titleStackView.leadingAnchor).isActive = true
         titleLabel.trailingAnchor.constraint(equalTo: ratingLabel.leadingAnchor, constant: -10).isActive = true
-
+        
         subtitleLabel.heightAnchor.constraint(equalToConstant: subtitleLabelHeight).isActive = true
         subtitleLabel.leadingAnchor.constraint(equalTo: mainStackView.leadingAnchor, constant: 10).isActive = true
         subtitleLabel.trailingAnchor.constraint(equalTo: mainStackView.trailingAnchor, constant: -10).isActive = true
-
+        
         descriptionLabel.leadingAnchor.constraint(equalTo: mainStackView.leadingAnchor, constant: 10).isActive = true
         descriptionLabel.trailingAnchor.constraint(equalTo: mainStackView.trailingAnchor, constant: -10).isActive = true
         descriptionLabel.heightAnchor.constraint(equalToConstant: descriptionLabelHeight).isActive = true
-
+        
         mainBackgroundView.leadingAnchor.constraint(equalTo: mainStackView.leadingAnchor).isActive = true
         mainBackgroundView.trailingAnchor.constraint(equalTo: mainStackView.trailingAnchor).isActive = true
         mainBackgroundView.topAnchor.constraint(equalTo: view.topAnchor, constant: 10).isActive = true
         mainBackgroundView.bottomAnchor.constraint(equalTo: mainStackView.bottomAnchor).isActive = true
-
+        
         buttonStackView.leadingAnchor.constraint(equalTo: mainStackView.leadingAnchor, constant: 0).isActive = true
         
     }
-
+    
     private func updateViewFor(_ buttons: [ALKGenericCard.Button]) {
         // Hide extra buttons
         actionButtons.enumerated().forEach {
@@ -322,16 +322,16 @@ public class VerticalAlignLabel: UILabel {
         case middle
         case bottom
     }
-
+    
     var verticalAlignment : VerticalAlignment = .top {
         didSet {
             setNeedsDisplay()
         }
     }
-
+    
     override public func textRect(forBounds bounds: CGRect, limitedToNumberOfLines: Int) -> CGRect {
         let rect = super.textRect(forBounds: bounds, limitedToNumberOfLines: limitedToNumberOfLines)
-
+        
         if UIView.userInterfaceLayoutDirection(for: .unspecified) == .rightToLeft {
             switch verticalAlignment {
             case .top:
@@ -352,7 +352,7 @@ public class VerticalAlignLabel: UILabel {
             }
         }
     }
-
+    
     override public func drawText(in rect: CGRect) {
         let r = self.textRect(forBounds: rect, limitedToNumberOfLines: self.numberOfLines)
         super.drawText(in: r)
@@ -374,7 +374,7 @@ public class InsetLabel: UILabel {
     }
     
     override public func drawText(in rect: CGRect) {
-        super.drawText(in: UIEdgeInsetsInsetRect(rect, insets))
+        super.drawText(in: self.frame.inset(by: insets))
     }
     
     override public var intrinsicContentSize: CGSize  {

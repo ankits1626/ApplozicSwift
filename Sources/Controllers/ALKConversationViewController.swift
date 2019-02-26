@@ -64,7 +64,7 @@ open class ALKConversationViewController: ALKBaseViewController, Localizable {
     fileprivate let moreBar: ALKMoreBar = ALKMoreBar(frame: .zero)
     fileprivate lazy var typingNoticeView = TypingNotice(localizedStringFileName : configuration.localizedStringFileName)
     fileprivate var alMqttConversationService: ALMQTTConversationService!
-    fileprivate let activityIndicator = UIActivityIndicatorView(activityIndicatorStyle: UIActivityIndicatorViewStyle.gray)
+    fileprivate let activityIndicator = UIActivityIndicatorView(style: UIActivityIndicatorView.Style.gray)
 
     fileprivate var keyboardSize: CGRect?
 
@@ -90,8 +90,9 @@ open class ALKConversationViewController: ALKBaseViewController, Localizable {
         tv.separatorStyle   = .none
         tv.allowsSelection  = false
         tv.clipsToBounds    = true
-        tv.keyboardDismissMode = UIScrollViewKeyboardDismissMode.onDrag
+        tv.keyboardDismissMode = UIScrollView.KeyboardDismissMode.onDrag
         tv.accessibilityIdentifier = "InnerChatScreenTableView"
+        tv.backgroundColor = UIColor.clear
         return tv
     }()
 
@@ -150,12 +151,12 @@ open class ALKConversationViewController: ALKBaseViewController, Localizable {
     }
 
     override func addObserver() {
-            NotificationCenter.default.addObserver(forName: NSNotification.Name.UIKeyboardWillShow, object: nil, queue: nil, using: { [weak self]
+        NotificationCenter.default.addObserver(forName: UIResponder.keyboardWillShowNotification, object: nil, queue: nil, using: { [weak self]
             notification in
             print("keyboard will show")
             guard let weakSelf = self else {return}
 
-            if let keyboardSize = (notification.userInfo?[UIKeyboardFrameEndUserInfoKey] as? NSValue)?.cgRectValue {
+                if let keyboardSize = (notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? NSValue)?.cgRectValue {
 
                 weakSelf.keyboardSize = keyboardSize
 
@@ -181,7 +182,7 @@ open class ALKConversationViewController: ALKBaseViewController, Localizable {
         })
 
 
-        NotificationCenter.default.addObserver(forName: NSNotification.Name.UIKeyboardWillHide, object: nil, queue: nil, using: {[weak self]
+        NotificationCenter.default.addObserver(forName: UIResponder.keyboardWillHideNotification, object: nil, queue: nil, using: {[weak self]
             (notification) in
 
             guard let weakSelf = self else {return}
@@ -189,7 +190,7 @@ open class ALKConversationViewController: ALKBaseViewController, Localizable {
 
             weakSelf.bottomConstraint?.constant = 0
 
-            let duration = (notification.userInfo?[UIKeyboardAnimationDurationUserInfoKey] as? NSNumber)?.doubleValue ?? 0.05
+            let duration = (notification.userInfo?[UIResponder.keyboardAnimationDurationUserInfoKey] as? NSNumber)?.doubleValue ?? 0.05
 
             UIView.animate(withDuration: duration, animations: {
                 view?.layoutIfNeeded()
@@ -270,8 +271,8 @@ open class ALKConversationViewController: ALKBaseViewController, Localizable {
 
     override func removeObserver() {
 
-        NotificationCenter.default.removeObserver(self, name: NSNotification.Name.UIKeyboardWillShow, object: nil)
-        NotificationCenter.default.removeObserver(self, name: NSNotification.Name.UIKeyboardWillHide, object: nil)
+        NotificationCenter.default.removeObserver(self, name: UIResponder.keyboardWillShowNotification, object: nil)
+        NotificationCenter.default.removeObserver(self, name: UIResponder.keyboardWillHideNotification, object: nil)
         NotificationCenter.default.removeObserver(self, name: NSNotification.Name(rawValue: "newMessageNotification"), object: nil)
         NotificationCenter.default.removeObserver(self, name: NSNotification.Name(rawValue: "notificationIndividualChat"), object: nil)
         NotificationCenter.default.removeObserver(self, name: NSNotification.Name(rawValue: "report_DELIVERED"), object: nil)
@@ -515,7 +516,7 @@ open class ALKConversationViewController: ALKBaseViewController, Localizable {
         self.automaticallyAdjustsScrollViewInsets = false
 
         if #available(iOS 11.0, *) {
-            tableView.contentInsetAdjustmentBehavior = UIScrollViewContentInsetAdjustmentBehavior.never
+            tableView.contentInsetAdjustmentBehavior = UIScrollView.ContentInsetAdjustmentBehavior.never
         }
         tableView.estimatedRowHeight = 0
 
@@ -540,6 +541,8 @@ open class ALKConversationViewController: ALKBaseViewController, Localizable {
         tableView.register(ALKFriendGenericCardCell.self)
         tableView.register(ALKFriendQuickReplyCell.self)
         tableView.register(ALKMyQuickReplyCell.self)
+        tableView.register(ALKMyMessageButtonCell.self)
+        tableView.register(ALKFriendMessageButtonCell.self)
     }
 
 
@@ -869,19 +872,28 @@ open class ALKConversationViewController: ALKBaseViewController, Localizable {
 
     }
 
-    func postGenericListButtonTapNotification(tag: Int, title: String, template: [ALKGenericListTemplate]) {
+    func postGenericListButtonTapNotification(tag: Int, title: String, template: [ALKGenericListTemplate], key: String) {
         print("\(title, tag) button selected in generic list")
         var infoDict = [String: Any]()
         infoDict["buttonName"] = title
         infoDict["buttonIndex"] = tag
         infoDict["template"] = template
+        infoDict["messageKey"] = key
         infoDict["userId"] = self.viewModel.contactId
         NotificationCenter.default.post(name: Notification.Name(rawValue: "GenericRichListButtonSelected"), object: infoDict)
     }
 
-    func quickReplySelected(index: Int, title: String, template: [Dictionary<String, Any>], message: ALKMessageViewModel, metadata: Dictionary<String, Any>?) {
+    func quickReplySelected(
+        index: Int,
+        title: String,
+        template: [Dictionary<String, Any>],
+        message: ALKMessageViewModel,
+        metadata: Dictionary<String, Any>?,
+        isButtonClickDisabled: Bool) {
         print("\(title, index) quick reply button selected")
         sendNotification(withName: "QuickReplyButtonSelected", buttonName: title, buttonIndex: index, template: template)
+
+        guard !isButtonClickDisabled else { return }
 
         /// Get message to send
         guard index <= template.count && index > 0 else { return }
@@ -896,6 +908,31 @@ open class ALKConversationViewController: ALKBaseViewController, Localizable {
         var customMetadata = [String: Any]()
         customMetadata[key] = metadata
         viewModel.send(message: msg, metadata: customMetadata)
+    }
+
+    func messageButtonSelected(
+        index: Int,
+        title: String,
+        message: ALKMessageViewModel,
+        isButtonClickDisabled: Bool) {
+        guard !isButtonClickDisabled,
+            let selectedButton = message.payloadFromMetadata()?[index],
+            let buttonTitle = selectedButton["name"] as? String,
+            buttonTitle == title
+            else {
+            return
+        }
+
+        guard
+            let type = selectedButton["type"] as? String,
+            type == "link"
+            else {
+                /// Submit Button
+                let text = selectedButton["replyText"] as? String ?? selectedButton["name"] as! String
+                submitButtonSelected(metadata: message.metadata!, text: text)
+                return
+        }
+        linkButtonSelected(selectedButton)
     }
 
     func collectionViewOffsetFromIndex(_ index: Int) -> CGFloat {
@@ -923,8 +960,8 @@ open class ALKConversationViewController: ALKBaseViewController, Localizable {
 
                 guard let strongSelf = self else {return}
 
-                strongSelf.view.bringSubview(toFront: strongSelf.moreBar)
-                strongSelf.view.sendSubview(toBack: strongSelf.tableView)
+                strongSelf.view.bringSubviewToFront(strongSelf.moreBar)
+                strongSelf.view.sendSubviewToBack(strongSelf.tableView)
         })
 
     }
@@ -984,6 +1021,87 @@ open class ALKConversationViewController: ALKBaseViewController, Localizable {
         self.isGroupDetailActionEnabled = configuration.isTapOnNavigationBarEnabled
         self.isProfileTapActionEnabled = configuration.isProfileTapActionEnabled
     }
+
+    private func postRequestUsing(url: URL, param: String) -> URLRequest? {
+        var request = URLRequest(url: url)
+        request.timeoutInterval = 600
+        request.httpMethod = "POST"
+        guard let data = param.data(using: .utf8) else { return nil }
+        request.httpBody = data
+        let contentLength = String(format: "%lu", UInt(data.count))
+        request.setValue(contentLength, forHTTPHeaderField: "Content-Length")
+        return request
+    }
+
+    private func requestHandler(_ request: URLRequest, _ completion: @escaping (_ data: Data?, _ response: URLResponse?, _ error: Error?) -> Void) {
+        let task = URLSession.shared.dataTask(with: request) {
+            data, response, error in
+            print("Response is \(String(describing: response)) and error is \(String(describing: error))")
+            completion(data, response, error)
+        }
+        task.resume()
+    }
+    
+    private func linkButtonSelected(_ selectedButton: Dictionary<String, Any>) {
+        guard
+            let urlString = selectedButton["url"] as? String,
+            let url = URL(string: urlString)
+        else {
+            return
+        }
+        if #available(iOS 10.0, *) {
+            UIApplication.shared.open(url, options: [:], completionHandler: nil)
+        } else {
+            UIApplication.shared.openURL(url)
+        }
+    }
+
+    private func submitButtonResponse(request: URLRequest) {
+        activityIndicator.startAnimating()
+        let group = DispatchGroup()
+        group.enter()
+        var responseData: String?
+        var responseUrl: URL?
+        requestHandler(request) { dat, response, error in
+            guard error == nil, let data = dat, let url = response?.url else {
+                print("Error while making submit button request: \(error), \(dat), \(response)")
+                group.leave()
+                return
+            }
+            responseData = String(data: data, encoding: .utf8)
+            responseUrl = url
+            group.leave()
+        }
+        group.notify(queue: .main) {
+            self.activityIndicator.stopAnimating()
+            guard let data = responseData, let url = responseUrl else {
+                return
+            }
+            let vc = WebViewController(htmlString: data, url: url)
+            self.navigationController?.pushViewController(vc, animated: true)
+        }
+    }
+
+    private func submitButtonSelected(metadata: Dictionary<String, Any>, text: String) {
+        guard
+            let formData = metadata["formData"] as? String,
+            let urlString = metadata["formAction"] as? String,
+            let url = URL(string: urlString),
+            var request = postRequestUsing(url: url, param: formData)
+            else {
+                return
+        }
+        self.viewModel.send(message: text, metadata: nil)
+        if let type = metadata["requestType"] as? String, type == "json" {
+            let contentType = "application/json"
+            request.addValue(contentType, forHTTPHeaderField: "Content-Type")
+            requestHandler(request) { _, _, _ in }
+        } else {
+            let contentType = "application/x-www-form-urlencoded"
+            request.addValue(contentType, forHTTPHeaderField: "Content-Type")
+            submitButtonResponse(request: request)
+        }
+    }
 }
 
 extension ALKConversationViewController: ALKConversationViewModelDelegate {
@@ -1034,8 +1152,13 @@ extension ALKConversationViewController: ALKConversationViewModelDelegate {
         guard indexPath.section >= 0 else {
             return
         }
+/*<<<<<<< HEAD
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
              self.tableView.scrollToBottom()
+=======*/
+        tableView.scrollToRow(at: indexPath, at: UITableView.ScrollPosition.bottom, animated: true)
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+            self.tableView.scrollToRow(at: indexPath, at: UITableView.ScrollPosition.bottom, animated: true)
         }
     }
 
@@ -1087,7 +1210,7 @@ extension ALKConversationViewController: ALKConversationViewModelDelegate {
         }
         var button: UIBarButtonItem
         if let image = configuration.rightNavBarImageForConversationView {
-            button = UIBarButtonItem(image: image, style: UIBarButtonItemStyle.plain, target: self,
+            button = UIBarButtonItem(image: image, style: UIBarButtonItem.Style.plain, target: self,
                                          action: #selector(ALKConversationViewController.refreshButtonAction(_:)))
         }else {
             button = UIBarButtonItem(barButtonSystemItem: configuration.rightNavBarSystemIconForConversationView, target: self,
@@ -1350,8 +1473,8 @@ extension ALKConversationViewController: UIImagePickerControllerDelegate, UINavi
     public func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [String : Any]) {
 
         // Video attachment
-        if let mediaType = info[UIImagePickerControllerMediaType] as? String, mediaType == "public.movie" {
-            guard let url = info[UIImagePickerControllerMediaURL] as? URL else { return }
+        if let mediaType = info[UIImagePickerController.InfoKey.mediaType.rawValue] as? String, mediaType == "public.movie" {
+            guard let url = info[UIImagePickerController.InfoKey.mediaURL.rawValue] as? URL else { return }
             print("video path is: ", url.path)
             viewModel.encodeVideo(videoURL: url, completion: {
                 path in

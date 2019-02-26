@@ -42,7 +42,7 @@ class ALKMyGenericCardCell: ALKChatBaseCell<ALKMessageViewModel> {
         return bv
     }()
     
-    override public init(style: UITableViewCellStyle, reuseIdentifier: String?) {
+    override public init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
         setupViews()
     }
@@ -80,7 +80,7 @@ class ALKMyGenericCardCell: ALKChatBaseCell<ALKMessageViewModel> {
         setupCollectionView()
         
         contentView.addViewsForAutolayout(views: [self.collectionView, self.messageView, self.bubbleView, timeLabel, stateView])
-        contentView.bringSubview(toFront: messageView)
+        contentView.bringSubviewToFront(messageView)
         
         messageView.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 5).isActive = true
         messageView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 95).isActive = true
@@ -96,7 +96,7 @@ class ALKMyGenericCardCell: ALKChatBaseCell<ALKMessageViewModel> {
         stateView.heightAnchor.constraint(equalToConstant: 9.0).isActive = true
         stateView.bottomAnchor.constraint(equalTo: bubbleView.bottomAnchor, constant: -1.0).isActive = true
         stateView.trailingAnchor.constraint(equalTo: bubbleView.leadingAnchor, constant: -2.0).isActive = true
-
+        
         timeLabel.trailingAnchor.constraint(equalTo: stateView.leadingAnchor, constant: -2.0).isActive = true
         timeLabel.bottomAnchor.constraint(equalTo: bubbleView.bottomAnchor, constant: 2).isActive = true
         

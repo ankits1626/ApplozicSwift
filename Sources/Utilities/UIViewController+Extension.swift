@@ -1,4 +1,3 @@
-
 //
 //  UIViewController+Extension.swift
 //  ApplozicSwift
@@ -6,7 +5,6 @@
 //  Created by Mukesh Thawani on 04/05/17.
 //  Copyright © 2017 Applozic. All rights reserved.
 //
-
 import Foundation
 import UIKit
 
@@ -50,16 +48,15 @@ extension UIViewController
     }
     
     func add(_ child: UIViewController) {
-        addChildViewController(child)
+        addChild(child)
         view.addSubview(child.view)
-        child.didMove(toParentViewController: self)
+        child.didMove(toParent: self)
     }
     
     func remove() {
         guard parent != nil else { return }
-        willMove(toParentViewController: nil)
+        willMove(toParent: nil)
         view.removeFromSuperview()
-        removeFromParentViewController()
+        removeFromParent()
     }
 }
-

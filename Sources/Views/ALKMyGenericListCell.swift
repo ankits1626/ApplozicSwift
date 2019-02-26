@@ -165,7 +165,7 @@ class ALKMyGenericListCell: ALKChatBaseCell<ALKMessageViewModel> {
         mainStackView.addArrangedSubview(itemTitleLabel)
         mainStackView.addArrangedSubview(buttonStackView)
         view.addViewsForAutolayout(views: [mainBackgroundView, mainStackView, self.messageView, self.bubbleView, timeLabel, stateView])
-        view.bringSubview(toFront: messageView)
+        view.bringSubviewToFront(messageView)
         
         messageView.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 2).isActive = true
         messageView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 95).isActive = true
@@ -233,7 +233,7 @@ class ALKMyGenericListCell: ALKChatBaseCell<ALKMessageViewModel> {
             else { $1.isHidden = false; $1.setTitle(buttons[$0].title, for: .normal) }
         }
     }
-
+    
     private func updateTitle(_ title: String?) {
         guard let text = title else {
             itemTitleLabel.isHidden = true

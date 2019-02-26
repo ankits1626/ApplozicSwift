@@ -40,8 +40,8 @@ class LoginViewController: UIViewController {
         
         if(ALChatManager.isNilOrEmpty( self.userName.text as NSString?))
         {
-            let alert = UIAlertController(title: "Applozic", message: "Please enter userId ", preferredStyle: UIAlertControllerStyle.alert)
-            alert.addAction(UIAlertAction(title: "Okay", style: UIAlertActionStyle.default, handler: nil))
+            let alert = UIAlertController(title: "Applozic", message: "Please enter userId ", preferredStyle: UIAlertController.Style.alert)
+            alert.addAction(UIAlertAction(title: "Okay", style: UIAlertAction.Style.default, handler: nil))
             self.present(alert, animated: true, completion: nil)
             return;
         }
@@ -63,7 +63,7 @@ class LoginViewController: UIViewController {
 
     private func registerUserToApplozic(alUser: ALUser) {
         let alChatManager = ALChatManager(applicationKey: ALChatManager.applicationId as NSString)
-        alChatManager.registerUser(alUser, completion: {response, error in
+        alChatManager.connectUser(alUser, completion: {response, error in
             if error == nil {
                 NSLog("[REGISTRATION] Applozic user registration was successful: %@ \(response?.isRegisteredSuccessfully())")
                 let vc = self.storyboard?.instantiateViewController(withIdentifier: "ViewController")

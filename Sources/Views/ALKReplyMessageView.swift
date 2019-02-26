@@ -32,14 +32,12 @@ open class ALKReplyMessageView: UIView, Localizable {
         return label
     }()
 
-
     open var closeButton: UIButton = {
         let button = UIButton(frame: CGRect.zero)
         let closeImage = UIImage(named: "close", in: Bundle.applozic, compatibleWith: nil)
         button.setImage(closeImage, for: .normal)
         return button
     }()
-
 
     open var previewImageView: UIImageView = {
         let imageView = UIImageView(frame: CGRect.zero)
@@ -263,7 +261,7 @@ open class ALKReplyMessageView: UIView, Localizable {
             let asset = AVURLAsset(url: filePath , options: nil)
             let imgGenerator = AVAssetImageGenerator(asset: asset)
             imgGenerator.appliesPreferredTrackTransform = true
-            let cgImage = try imgGenerator.copyCGImage(at: CMTimeMake(0, 1), actualTime: nil)
+            let cgImage = try imgGenerator.copyCGImage(at: CMTimeMake(value: 0, timescale: 1), actualTime: nil)
             return UIImage(cgImage: cgImage)
             
         } catch let error {

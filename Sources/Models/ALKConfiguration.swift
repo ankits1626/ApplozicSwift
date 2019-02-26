@@ -89,7 +89,6 @@ public struct ALKConfiguration {
     /// color of the title
     public var navigationTitleColor = UIColor.white
 
-
     /// If true then start new conversation button shown in the empty state will be disabled
     public var hideEmptyStateStartNewButtonInConversationList = false
 
@@ -112,6 +111,13 @@ public struct ALKConfiguration {
             ALKBaseNavigationViewController.statusBarStyle = statusBarStyle
         }
     }
+
+
+    /// If true then the all the buttons in messages of type Quick replies,
+    /// Generic Cards, Lists etc. will be disabled.
+    /// USAGE: It can be used in cases where your app supports multiple types
+    /// of users and you want to disable the buttons for a particular type of users.
+    public var disableRichMessageButtonAction = false
 
     public init() { }
 }

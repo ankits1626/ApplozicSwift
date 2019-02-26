@@ -96,6 +96,8 @@ extension ALMessage: ALKChatViewModelProtocol {
             return message
         case .quickReply:
             return message
+        case .button:
+            return message
         }
     }
 
@@ -170,9 +172,7 @@ extension ALMessage {
 
         switch Int32(contentType) {
         case ALMESSAGE_CONTENT_DEFAULT:
-            let isGenericCardType = isGenericCard()
-            guard isGenericCardType || isGenericList() || isQuickReply() else {return .text}
-            return isGenericCardType ? .genericCard:isQuickReply() ? .quickReply: .genericList
+            return richMessageType()
         case ALMESSAGE_CONTENT_LOCATION:
             return .location
         case ALMESSAGE_CHANNEL_NOTIFICATION:
@@ -295,19 +295,14 @@ extension ALMessage {
         }
     }
 
-    private func isGenericCard() -> Bool {
+    private func richMessageType() -> ALKMessageType {
         guard let metadata = metadata,
-            let templateId = metadata["templateId"] as? String else {
-                return false
+            let contentType = metadata["contentType"] as? String, contentType == "300",
+            let templateId = metadata["templateId"] as? String
+            else {
+                return .text
         }
-        return templateId == "2"
-    }
 
-    private func isGenericList() -> Bool {
-        guard let metadata = metadata,
-            let templateId = metadata["templateId"] as? String else {
-                return false
-        }
         return templateId == "8"
     }
     
@@ -316,7 +311,6 @@ extension ALMessage {
             let templateId = metadata["templateId"] as? String else {
                 return false
         }
-        return templateId == "6"
     }
 
 }

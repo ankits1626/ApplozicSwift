@@ -77,8 +77,12 @@ public class ALKPushNotificationHandler: Localizable {
                 weakSelf.title = displayName
             }
 
+
             //Disabling as of now to avoid unnecessaru vaigation stack
             /*if UIApplication.shared.applicationState == .active {
+
+            
+            if UIApplication.shared.applicationState == .active {
                 guard let userInfo = notification.userInfo, let alertValue = userInfo["alertValue"] as? String else {
                         return
                 }

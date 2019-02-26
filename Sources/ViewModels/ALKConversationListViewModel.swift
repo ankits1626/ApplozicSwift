@@ -201,7 +201,6 @@ final public class ALKConversationListViewModel: NSObject, ALKConversationListVi
         })
     }
 
-
     public func sendUnmuteRequestFor(message: ALMessage, withCompletion: @escaping (Bool) -> ()) {
 
         let time = (Int(Date().timeIntervalSince1970) * 1000)
