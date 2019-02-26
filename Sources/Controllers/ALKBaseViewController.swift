@@ -10,9 +10,9 @@ import UIKit
 import Applozic
 
 open class ALKBaseViewController: UIViewController, ALKConfigurable {
-
+    
     public var configuration: ALKConfiguration!
-
+    
     required public init(configuration: ALKConfiguration) {
         self.configuration = configuration
         super.init(nibName: nil, bundle: nil)
@@ -29,8 +29,8 @@ open class ALKBaseViewController: UIViewController, ALKConfigurable {
         super.viewWillAppear(animated)
         self.navigationController?.navigationBar.barTintColor = configuration.navigationBarBackgroundColor
         self.navigationController?.navigationBar.tintColor = configuration.navigationBarItemColor
-        self.navigationController?.navigationBar.titleTextAttributes = [NSAttributedStringKey.foregroundColor : configuration.navigationTitleColor]
-        self.navigationController?.navigationBar.titleTextAttributes = [NSAttributedStringKey.foregroundColor:configuration.navigationBarTitleColor]
+        self.navigationController?.navigationBar.titleTextAttributes = [NSAttributedString.Key.foregroundColor : configuration.navigationTitleColor]
+        self.navigationController?.navigationBar.titleTextAttributes = [NSAttributedString.Key.foregroundColor:configuration.navigationBarTitleColor]
         self.navigationController?.navigationBar.isTranslucent = false
         if self.navigationController?.viewControllers.first != self {
             var backImage = UIImage.init(named: "icon_back", in: Bundle.applozic, compatibleWith: nil)
@@ -40,7 +40,7 @@ open class ALKBaseViewController: UIViewController, ALKConfigurable {
         if configuration.hideNavigationBarBottomLine {
             navigationController?.navigationBar.hideBottomHairline()}
     }
-
+    
     override open func viewDidLoad() {
         super.viewDidLoad()
         checkPricingPackage()
@@ -69,12 +69,12 @@ open class ALKBaseViewController: UIViewController, ALKConfigurable {
         removeObserver()
         NSLog("💩 \(#function) ❌❌ \(self)‼️‼️‼️‼️")
     }
-
+    
     func checkPricingPackage() {
         if ALApplicationInfo().isChatSuspended() {
             showAccountSuspensionView()
         }
     }
-
+    
     func showAccountSuspensionView() {}
 }

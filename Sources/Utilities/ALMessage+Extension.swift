@@ -15,7 +15,7 @@ let myMessage = "5"
 let imageBaseUrl = ALUserDefaultsHandler.getFILEURL() + "/rest/ws/aws/file/"
 
 extension ALMessage: ALKChatViewModelProtocol {
-
+    
     private var alContact: ALContact? {
         let alContactDbService = ALContactDBService()
         guard let alContact = alContactDbService.loadContact(byKey: "userId", value: self.to) else {
@@ -23,10 +23,10 @@ extension ALMessage: ALKChatViewModelProtocol {
         }
         return alContact
     }
-
+    
     private var alChannel: ALChannel? {
         let alChannelService = ALChannelService()
-
+        
         // TODO:  This is a workaround as other method uses closure.
         // Later replace this with:
         // alChannelService.getChannelInformation(, orClientChannelKey: , withCompletion: )
@@ -35,35 +35,35 @@ extension ALMessage: ALKChatViewModelProtocol {
         }
         return alChannel
     }
-
+    
     public var avatar: URL? {
         guard let alContact = alContact, let url = alContact.contactImageUrl else {
             return nil
         }
         return URL(string: url)
     }
-
+    
     public var avatarImage: UIImage? {
         return isGroupChat ? UIImage(named: "group_profile_picture-1", in: Bundle.applozic, compatibleWith: nil) : nil
     }
-
+    
     public var avatarGroupImageUrl: String? {
-
+        
         guard let alChannel = alChannel, let avatar = alChannel.channelImageURL else {
             return nil
         }
         return avatar
     }
-
+    
     public var name: String {
         guard let alContact = alContact, let id = alContact.userId  else {
             return ""
         }
         guard let displayName = alContact.getDisplayName(), !displayName.isEmpty else { return id }
-
+        
         return displayName
     }
-
+    
     public var groupName: String {
         if isGroupChat {
             guard let alChannel = alChannel, let name = alChannel.name else {
@@ -73,7 +73,7 @@ extension ALMessage: ALKChatViewModelProtocol {
         }
         return ""
     }
-
+    
     public var theLastMessage: String? {
         switch messageType {
         case .text:
@@ -100,7 +100,7 @@ extension ALMessage: ALKChatViewModelProtocol {
             return message
         }
     }
-
+    
     public var hasUnreadMessages: Bool {
         if isGroupChat {
             guard let alChannel = alChannel, let unreadCount = alChannel.unreadCount else {
@@ -114,18 +114,18 @@ extension ALMessage: ALKChatViewModelProtocol {
             return unreadCount.boolValue
         }
     }
-
+    
     var identifier: String {
         guard let key = self.key else {
             return ""
         }
         return key
     }
-
+    
     var friendIdentifier: String? {
         return nil
     }
-
+    
     public var totalNumberOfUnreadMessages: UInt {
         if isGroupChat {
             guard let alChannel = alChannel, let unreadCount = alChannel.unreadCount else {
@@ -138,24 +138,24 @@ extension ALMessage: ALKChatViewModelProtocol {
             }
             return UInt(truncating: unreadCount)
         }
-
+        
     }
-
+    
     public var isGroupChat: Bool {
         guard let _ = self.groupId else {
             return false
         }
         return true
     }
-
+    
     public var contactId: String? {
         return self.contactIds
     }
-
+    
     public var channelKey: NSNumber? {
         return self.groupId
     }
-
+    
     public var createdAt: String? {
         let isToday = ALUtilityClass.isToday(date)
         return getCreatedAtTime(isToday)
@@ -163,13 +163,13 @@ extension ALMessage: ALKChatViewModelProtocol {
 }
 
 extension ALMessage {
-
+    
     var isMyMessage: Bool {
         return (type != nil) ? (type == myMessage):false
     }
-
+    
     var messageType: ALKMessageType {
-
+        
         switch Int32(contentType) {
         case ALMESSAGE_CONTENT_DEFAULT:
             return richMessageType()
@@ -184,41 +184,41 @@ extension ALMessage {
             return attachmentType
         }
     }
-
+    
     var date: Date {
         guard let time = createdAtTime else { return Date() }
         let sentAt = Date(timeIntervalSince1970: Double(time.doubleValue/1000))
         return sentAt
     }
-
+    
     var time: String? {
-
+        
         let dateFormatterGet = DateFormatter()
         dateFormatterGet.dateFormat = "HH:mm"
         return dateFormatterGet.string(from: date)
     }
-
+    
     var isSent: Bool {
         guard let status = status else {
             return false
         }
         return status == NSNumber(integerLiteral: Int(SENT.rawValue))
     }
-
+    
     var isAllRead: Bool {
         guard let status = status else {
             return false
         }
         return status == NSNumber(integerLiteral: Int(DELIVERED_AND_READ.rawValue))
     }
-
+    
     var isAllReceived: Bool {
         guard let status = status else {
             return false
         }
         return status == NSNumber(integerLiteral: Int(DELIVERED.rawValue))
     }
-
+    
     var ratio: CGFloat {
         // Using default
         if messageType == .text {
@@ -226,42 +226,42 @@ extension ALMessage {
         }
         return 0.9
     }
-
+    
     var size: Int64 {
         guard let fileMeta = fileMeta, let size = Int64(fileMeta.size) else {
             return 0
         }
         return size
     }
-
+    
     var thumbnailURL: URL? {
         guard let fileMeta = fileMeta, let urlStr = fileMeta.thumbnailUrl, let url = URL(string: urlStr)  else {
             return nil
         }
         return url
     }
-
+    
     var imageUrl: URL? {
         guard let fileMeta = fileMeta, let urlStr = fileMeta.blobKey, let imageUrl = URL(string: imageBaseUrl + urlStr) else {
             return nil
         }
         return imageUrl
     }
-
+    
     var filePath: String? {
         guard let filePath = imageFilePath else {
             return nil
         }
         return filePath
     }
-
+    
     var geocode: Geocode? {
         guard messageType == .location else {
             return nil
         }
         if let message = message {
             let jsonObject = try! JSONSerialization.jsonObject(with: message.data(using: .utf8)!, options: .mutableContainers) as! [String: Any]
-
+            
             // Check if type is double or string
             if let lat = jsonObject["lat"] as? Double, let lon = jsonObject["lon"] as? Double {
                 let location = CLLocationCoordinate2D(latitude: lat, longitude: lon)
@@ -277,11 +277,11 @@ extension ALMessage {
         }
         return nil
     }
-
+    
     var fileMetaInfo: ALFileMetaInfo? {
         return self.fileMeta ?? nil
     }
-
+    
     private func getAttachmentType() -> ALKMessageType? {
         guard let fileMeta = fileMeta else {return nil}
         if fileMeta.contentType.hasPrefix("image") {
@@ -294,7 +294,7 @@ extension ALMessage {
             return nil
         }
     }
-
+    
     private func richMessageType() -> ALKMessageType {
         guard let metadata = metadata,
             let contentType = metadata["contentType"] as? String, contentType == "300",
@@ -302,21 +302,24 @@ extension ALMessage {
             else {
                 return .text
         }
-
-        return templateId == "8"
-    }
-    
-    private func isQuickReply() -> Bool {
-        guard let metadata = metadata,
-            let templateId = metadata["templateId"] as? String else {
-                return false
+        switch templateId {
+        case "2":
+            return .genericCard
+        case "3":
+            return .button
+        case "6":
+            return .quickReply
+        case "8":
+            return .genericList
+        default:
+            return .text
         }
     }
-
+    
 }
 
 extension ALMessage {
-
+    
     public var messageModel: ALKMessageModel {
         let messageModel = ALKMessageModel()
         messageModel.message = message

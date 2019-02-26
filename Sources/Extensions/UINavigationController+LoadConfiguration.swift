@@ -12,7 +12,7 @@ extension UINavigationController{
     func loadConfigurations(_ configuration : ALKConfiguration) {
         self.navigationBar.barTintColor = configuration.navigationBarBackgroundColor
         self.navigationBar.tintColor = configuration.navigationBarItemColor
-        self.navigationBar.titleTextAttributes = [NSAttributedStringKey.foregroundColor : configuration.navigationTitleColor]
+        self.navigationBar.titleTextAttributes = [NSAttributedString.Key.foregroundColor : configuration.navigationTitleColor]
         self.navigationBar.isTranslucent = false
         if configuration.hideNavigationBarBottomLine {
             self.navigationBar.hideBottomHairline()}
